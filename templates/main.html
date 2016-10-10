@@ -1,0 +1,25 @@
+<html>
+	<head>
+		<script>
+			function send(){
+				if( document.getElementById("file").value.length == 0 ){
+					alert("input file");
+					return;
+				}
+				if( document.getElementById("email").value.length == 0 ){
+					alert("input email");
+					return;
+				}
+				document.getElementById("upload_form").submit();
+			}
+		</script>
+	</head>
+	<body>
+	    <h1>Upload new File</h1>
+	    <form action="upload" id="upload_form" method=post enctype=multipart/form-data>
+	        email : <input tupe=text name=email id="email"> <br> <br> 
+	    	xls file : <input type=file name=file id="file"> <br> <br> 
+	    </form>
+	    <button onclick="send()"> Upload </button> <br>
+	</body>
+</html>
