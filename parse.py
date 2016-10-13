@@ -2,6 +2,13 @@
 from urllib2 import urlopen, quote
 import xlrd, xlwt
 import json, os, time, random
+import smtplib
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
+from email.MIMEImage import MIMEImage
+from email.MIMEBase import MIMEBase
+from email import Encoders
+import sys
 
 def isset(variable):
 	return variable in locals() or variable in globals()
@@ -15,8 +22,12 @@ def get_gps(data):
 		lng = coordinates[ 'geometry' ][ 'location' ][ 'lng' ]
 	return ( lat,lng )
 
+if len(sys.argv) != 3:
+	exit()
+
 UPLOAD_FOLDER = os.path.dirname( os.path.abspath( __file__ ) )
-filename = "test.xlsx"
+#filename = "test.xlsx"
+filename = sys.argv[1]
 path = UPLOAD_FOLDER
 file_path = path + "/tmp/" + filename
 new_filename = str( int( time.time() ) ) + str( int(random.random()*100) ) + '.xls'
@@ -60,3 +71,40 @@ for i in range( 1,row ):
 		wh2.write( i, col + 1, str( data[1] ) )
 print "write success : %s" % new_file_path
 wb2.save( new_file_path )
+
+
+
+gmail_user = 'qwer10773@gmail.com'
+gmail_pwd = 'asdqwe123!@#'
+recipients = sys.argv[2]
+
+#Create Module
+def mail(to, subject, text, file):
+   msg = MIMEMultipart()
+   msg['From'] = gmail_user
+   msg['To'] = to
+   msg['Subject'] = subject
+
+   msg.attach(MIMEText(text))
+
+   #get all the attachments
+   part = MIMEBase('application', 'octet-stream')
+   part.set_payload(open(file, 'rb').read())
+   Encoders.encode_base64(part)
+   part.add_header('Content-Disposition', 'attachment; filename="%s"' % file)
+   msg.attach(part)
+
+   mailServer = smtplib.SMTP("smtp.gmail.com", 587)
+   mailServer.ehlo()
+   mailServer.starttls()
+   mailServer.ehlo()
+   mailServer.login(gmail_user, gmail_pwd)
+   mailServer.sendmail(gmail_user, to, msg.as_string())
+   # Should be mailServer.quit(), but that crashes...
+   mailServer.close()
+
+#send it
+mail(recipients,
+   "geo coding result",
+   "hi.",
+   new_file_path)

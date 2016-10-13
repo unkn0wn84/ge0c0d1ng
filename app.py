@@ -7,10 +7,12 @@ UPLOAD_FOLDER = os.path.dirname( os.path.abspath( __file__ ) ) + "/tmp"
 UPLOAD_FOLDER_2 = os.path.dirname( os.path.abspath( __file__ ) ) + "/ntmp"
 ALLOW_LIST = [ 'xlsx' ]
 ALLOWED_EXTENSIONS = set( ALLOW_LIST )
+parespy = os.path.join( os.path.dirname( os.path.abspath( __file__ ) ) , "parse.py" )
 
 print "[ * ] Server Info"
 print "Upload Path : %s" % UPLOAD_FOLDER
 print "Allowed File type : %s" % "".join( ALLOW_LIST )
+print parespy
 os.system( "mkdir %s"  % UPLOAD_FOLDER  )
 os.system( "mkdir %s"  % UPLOAD_FOLDER_2  )
 
@@ -32,7 +34,8 @@ def upload_file():
 		email = request.form[ 'email' ]
 		filename = str( int( time.time() ) ) + str( int(random.random()*100) ) + ALLOW_LIST[0]
 		file.save( os.path.join( app.config['UPLOAD_FOLDER'], filename ) )
-		return "<script>alert('result send to : %s ');history.back();</script>" % email
+		os.system( "python %s %s %s &" % ( parespy, filename, email ) )
+		return "<script>alert('result send to : %s ');location.href='/'</script>" % email
 	return "<script>alert('not allowed file type');history.back();</script>"
 
 if __name__ == '__main__':
